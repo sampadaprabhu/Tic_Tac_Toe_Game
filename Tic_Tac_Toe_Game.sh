@@ -1,20 +1,20 @@
-#!/bin/bash -x
+#!/bin/bash
 readonly ROWS=9
+readonly EMPTY=1
 declare -a gameBoard
-boolean=0
-moves=0
+count=0
 choice=1
 playerTurn=1
+moves=0
+boolean=5
 position=-1
-count=0
-
-echo "Welcome To Tic Tac Toe Game"
-
+echo "Welcome to Tic Tac Toe Problem"
 #initialize
 initialize()
 {
 	position=0
 }
+
 #changePlayerTurn: To change player turn
 changePlayerTurn()
 {
@@ -33,7 +33,7 @@ resetTheBoard()
 		gameBoard[$i]="-"
 	done
 }
-
+	
 #show: Letter and Turn assign 
 show()
 {
@@ -41,6 +41,7 @@ show()
 	echo "opponentLetter: $opponentLetter"
 	echo "computerTurn: $computerTurn"
 	echo "opponentTurn: $opponentTurn"
+	echo
 }
 #assignedLetter: To assign letter X or O
 assignedLetter()
@@ -71,9 +72,6 @@ displayGameBoard()
 	echo "${gameBoard[6]} | ${gameBoard[7]} | ${gameBoard[8]}"
 	echo "---------"
 }
-
-
-#Functions To Winner Or Tie
 #winningConditionOfRow
 winningConditionOfRow()
 {
@@ -128,15 +126,15 @@ winningConditionOfDiagonal()
 #isWinner: Checking current player is winner or not
 isWinner()
 {
-	if [[ $boolean -eq 0 ]]
+	if [[ $boolean -eq 5 ]]
 	then	
 		winningConditionOfRow $winsign
 	fi
-	if [[ $boolean -eq 0 ]]
+	if [[ $boolean -eq 5 ]]
 	then
 		winningConditionOfColumn $winsign
 	fi
-	if [[ $boolean -eq 0 ]]
+	if [[ $boolean -eq 5 ]]
 	then
 		winningConditionOfDiagonal $winsign
 	fi
@@ -180,14 +178,6 @@ input()
 		
 	fi
 }
-
-#Function To Introducing Computer
-function smartComputer()
-{
-	computer="Computer Is Play Like You!!"
-	echo $computer
-}
-
 
 #computerSmartMoveForRow
 computerSmartMoveForRow()
@@ -308,6 +298,7 @@ computerSmartMove()
 		computerSmartMoveForDiagonal $sign
 	fi		
 }
+
 computerMove()
 {	
 	if [[ $position -eq 0 ]]
@@ -316,9 +307,20 @@ computerMove()
 	fi
 	if [[ $position -eq 0 ]]
 	then
+		computerSmartMove $opponentLetter		
+	fi
+	if [[ $position -eq 0 ]]
+	then
 		position=$((RANDOM%9))
 		input $computerLetter
 	fi
+}
+#opponentMove
+opponentMove()
+{
+	echo "Enter Your Move:"
+	read position
+	input $opponentLetter
 }
 #ticTacToe: Game
 ticTacToe()
@@ -327,7 +329,11 @@ ticTacToe()
 	while [[ $choice -eq 1 ]]
 	do	
 		initialize	
-		if [[ $playerTurn -eq $computerTurn ]]
+		if [[ $playerTurn -eq $opponentTurn ]]
+		then
+			echo "***Opponent Move***"
+			opponentMove			
+		elif [[ $playerTurn -eq $computerTurn ]]
 		then			
 			echo "***Computer Move***"
 				computerMove			
@@ -342,5 +348,4 @@ startGame()
 }
 startGame
 displayGameBoard
-smartComputer
 ticTacToe
