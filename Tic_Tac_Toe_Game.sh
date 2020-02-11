@@ -321,7 +321,21 @@ isCenterEmpty()
 	fi
 	input
 }
-
+#isSideEmpty
+isSideEmpty()
+{
+	key=0
+	flag=0
+	for (( i=0 ;i<$ROWS;i++ ))
+	do
+		if [[ $(( $i % 2 )) -eq 1 && ${gameBoard[$i]} == "-"  ]]
+		then
+			position=$((i+1))
+			input $computerLetter
+		fi
+	done
+	input		
+}
 computerMove()
 {	
 	if [[ $position -eq 0 ]]
@@ -342,11 +356,14 @@ computerMove()
 	fi
 	if [[ $position -eq 0 ]]
 	then
+		isSideEmpty	
+	fi
+	if [[ $position -eq 0 ]]
+	then
 		position=$((RANDOM%9))
 		input $computerLetter
 	fi
 }
-
 #opponentMove
 opponentMove()
 {
