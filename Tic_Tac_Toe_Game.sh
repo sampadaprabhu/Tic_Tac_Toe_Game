@@ -11,3 +11,21 @@ resetTheBoard()
 	done
 }
 resetTheBoard
+#show: Letter and Turn assign 
+show()
+{
+	echo "Letter: $letter"
+}
+#assignedLetter: To assign letter X or O
+assignedLetter()
+{
+	local randomNumber=$((RANDOM%2))
+	if [[ $randomNumber -eq 0 ]]
+	then
+		letter="X"
+	else
+		letter="O"
+	fi
+	show
+}
+assignedLetter
