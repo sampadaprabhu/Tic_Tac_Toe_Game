@@ -15,16 +15,19 @@ resetTheBoard
 show()
 {
 	echo "Letter: $letter"
+	echo "Player: $player"
 }
 #assignedLetter: To assign letter X or O
 assignedLetter()
 {
-	local randomNumber=$((RANDOM%2))
-	if [[ $randomNumber -eq 0 ]]
+	 toss=$((RANDOM%2))
+	if [[ $toss -eq 0 ]]
 	then
 		letter="X"
+		player=1
 	else
 		letter="O"
+		player=1
 	fi
 	show
 }
