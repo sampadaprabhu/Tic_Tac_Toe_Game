@@ -156,3 +156,10 @@ input()
 	fi
 }
 input
+#Function To Introducing Computer
+function smartComputer()
+{
+	computer="Computer Is Play Like You!!"
+	echo $computer
+}
+smartComputer
