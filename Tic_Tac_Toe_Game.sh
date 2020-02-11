@@ -1,11 +1,30 @@
 #!/bin/bash -x
 readonly ROWS=9
-
+declare -a gameBoard
 boolean=0
 moves=0
 choice=1
-declare -a gameBoard
+playerTurn=1
+position=-1
+count=0
+
 echo "Welcome To Tic Tac Toe Game"
+
+#initialize
+initialize()
+{
+	position=0
+}
+#changePlayerTurn: To change player turn
+changePlayerTurn()
+{
+	if [[ $playerTurn -eq 1 ]]
+	then
+		playerTurn=2
+	else
+		playerTurn=1
+	fi
+}
 #resetTheBoard: To initialize gameBoard or for fresh start 
 resetTheBoard()
 {
@@ -14,28 +33,33 @@ resetTheBoard()
 		gameBoard[$i]="-"
 	done
 }
-resetTheBoard
+
 #show: Letter and Turn assign 
 show()
 {
-	echo "Letter: $letter"
-	echo "Player: $player"
+	echo "computerLetter: $computerLetter"
+	echo "opponentLetter: $opponentLetter"
+	echo "computerTurn: $computerTurn"
+	echo "opponentTurn: $opponentTurn"
 }
 #assignedLetter: To assign letter X or O
 assignedLetter()
 {
-	 toss=$((RANDOM%2))
-	if [[ $toss -eq 0 ]]
+	local randomNumber=$((RANDOM%2))
+	if [[ $randomNumber -eq 0 ]]
 	then
-		letter="X"
-		player=1
+		opponentLetter="X"
+		computerLetter="O"
+		opponentTurn=1
+		computerTurn=2
 	else
-		letter="O"
-		player=1
+		computerLetter="X"
+		opponentLetter="O"
+		computerTurn=1
+		opponentTurn=2
 	fi
 	show
 }
-assignedLetter
 #displayGameBoard: Displaying the gameBoard
 displayGameBoard()
 {
@@ -47,7 +71,7 @@ displayGameBoard()
 	echo "${gameBoard[6]} | ${gameBoard[7]} | ${gameBoard[8]}"
 	echo "---------"
 }
-displayGameBoard
+
 
 #Functions To Winner Or Tie
 #winningConditionOfRow
@@ -121,7 +145,7 @@ isWinner()
 displayWinner()
 {	
 	winsign=$1
-	isWinner
+	isWinner #$winsign
 	if [[ $boolean -eq 1 && $playerTurn -eq $computerTurn ]]
 	then
 		echo "Computer wins...!!"
@@ -135,6 +159,7 @@ displayWinner()
 #input: Assigning values to the gameBoard
 input()
 {
+	letter=$1
 	if [[ $position -lt 1 || $position -gt 9 ]]
 	then
 		echo "Invalid Move"
@@ -155,11 +180,167 @@ input()
 		
 	fi
 }
-input
+
 #Function To Introducing Computer
 function smartComputer()
 {
 	computer="Computer Is Play Like You!!"
 	echo $computer
 }
+
+
+#computerSmartMoveForRow
+computerSmartMoveForRow()
+{
+	flag=0
+	letter=$1
+	for ((i=0;i<9;i=i+3))
+	do
+		if [[ ${gameBoard[$i]} == $letter && ${gameBoard[$((i+1))]} == $letter && ${gameBoard[$((i+2))]} == "-" ]]	
+		then 
+			position=$((i+3)) 
+			flag=1
+			input $computerLetter
+			break
+		fi
+		if [[ ${gameBoard[$i]} == "-" && ${gameBoard[$((i+1))]} == $letter && ${gameBoard[$((i+2))]} == $letter ]]	
+		then 
+			position=$((i+1)) 
+			flag=1			
+			input $computerLetter
+			break
+		fi
+		if [[ ${gameBoard[$i]} == $letter && ${gameBoard[$((i+1))]} == "-" && ${gameBoard[$((i+2))]} == $letter ]]	
+		then 
+			position=$((i+2)) 
+			flag=1
+			input $computerLetter
+			break
+		fi
+	done
+}
+
+computerSmartMoveForColumn()
+{
+	flag=0
+	letter=$1
+	for ((i=0;i<3;i++))
+	do
+		if [[ ${gameBoard[$i]} == $letter && ${gameBoard[$((i+3))]} == $letter && ${gameBoard[$((i+6))]} == "-" ]]	
+		then 
+			position=$((i+7)) 
+			flag=1
+			input $computerLetter
+			break
+		fi
+		if [[ ${gameBoard[$i]} == "-" && ${gameBoard[$((i+3))]} == $letter && ${gameBoard[$((i+6))]} == $letter ]]	
+		then 
+			position=$((i+1)) 
+			flag=1			
+			input $computerLetter
+			break
+		fi
+		if [[ ${gameBoard[$i]} == $letter && ${gameBoard[$((i+3))]} == "-" && ${gameBoard[$((i+6))]} == $letter ]]	
+		then 
+			position=$((i+4)) 
+			flag=1
+			input $computerLetter
+			break
+		fi
+	done
+}
+
+computerSmartMoveForDiagonal()
+{
+	flag=0
+	letter=$1
+	if [[ ${gameBoard[0]} == $letter && ${gameBoard[4]} == $letter && ${gameBoard[8]} == "-" ]]
+	then
+		position=9
+		flag=1
+		input $computerLetter
+	fi 
+	if [[ ${gameBoard[0]} == $letter && ${gameBoard[4]} == "-" && ${gameBoard[8]} == $letter ]]
+	then 
+		position=5
+		flag=1
+		input $computerLetter
+	fi
+	if [[ ${gameBoard[0]} == "-" && ${gameBoard[4]} == $letter && ${gameBoard[8]} == $letter ]]
+	then
+		position=1
+		flag=1
+		input $computerLetter
+	fi
+	if [[ ${gameBoard[6]} == $letter && ${gameBoard[4]} == $letter && ${gameBoard[2]} == "-" ]]
+	then 
+		position=3
+		flag=1
+		input $computerLetter
+	fi
+	if [[ ${gameBoard[6]} == $letter && ${gameBoard[4]} == "-" && ${gameBoard[2]} == $letter ]]
+	then 
+		position=5
+		flag=1
+		input $computerLetter
+	fi
+	if [[ ${gameBoard[6]} == "-" && ${gameBoard[4]} == $letter && ${gameBoard[2]} == $letter ]]
+	then 
+		position=7
+		flag=1
+		input $computerLetter
+	fi
+	
+}
+computerSmartMove()
+{
+	k=0
+	sign=$1
+	computerSmartMoveForRow $sign
+	if [[ $flag -eq 0 ]]
+	then
+		k=1
+		computerSmartMoveForColumn $sign
+	fi
+	if [[ $flag -eq 0 ]]
+	then
+		k=1
+		computerSmartMoveForDiagonal $sign
+	fi		
+}
+computerMove()
+{	
+	if [[ $position -eq 0 ]]
+	then
+		computerSmartMove $computerLetter	
+	fi
+	if [[ $position -eq 0 ]]
+	then
+		position=$((RANDOM%9))
+		input $computerLetter
+	fi
+}
+#ticTacToe: Game
+ticTacToe()
+{
+	count=0
+	while [[ $choice -eq 1 ]]
+	do	
+		initialize	
+		if [[ $playerTurn -eq $computerTurn ]]
+		then			
+			echo "***Computer Move***"
+				computerMove			
+		fi
+	done
+}
+#startGame: Initial conditions  
+startGame()
+{
+	resetTheBoard
+	assignedLetter
+}
+startGame
+displayGameBoard
 smartComputer
+ticTacToe
