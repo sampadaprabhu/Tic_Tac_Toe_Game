@@ -298,6 +298,20 @@ computerSmartMove()
 		computerSmartMoveForDiagonal $sign
 	fi		
 }
+#isCornerEmpty
+isCornerEmpty()
+{
+	flag=0
+	for (( i=0;i<$ROWS;i++ ))
+	do
+		if [[ $(( $i % 2 )) -eq 0 && ${gameBoard[$i]} == "-" ]]
+		then
+			position=$((i+1))
+			input $computerLetter
+			break
+		fi
+	done
+}
 
 computerMove()
 {	
@@ -308,6 +322,10 @@ computerMove()
 	if [[ $position -eq 0 ]]
 	then
 		computerSmartMove $opponentLetter		
+	fi
+	if [[ $position -eq 0 ]]
+	then
+		isCornerEmpty	
 	fi
 	if [[ $position -eq 0 ]]
 	then
