@@ -1,14 +1,22 @@
 #!/bin/bash
+#Constant
 readonly ROWS=9
 readonly EMPTY=1
+
+#Declaring Array
 declare -a gameBoard
+
+#Variables
 count=0
 choice=1
 playerTurn=1
 moves=0
-boolean=5
+boolean=0
 position=-1
+
+#Welcom Message
 echo "Welcome to Tic Tac Toe Problem"
+
 #initialize
 initialize()
 {
@@ -25,6 +33,7 @@ changePlayerTurn()
 		playerTurn=1
 	fi
 }
+
 #resetTheBoard: To initialize gameBoard or for fresh start 
 resetTheBoard()
 {
@@ -41,13 +50,13 @@ show()
 	echo "opponentLetter: $opponentLetter"
 	echo "computerTurn: $computerTurn"
 	echo "opponentTurn: $opponentTurn"
-	echo
 }
+
 #assignedLetter: To assign letter X or O
 assignedLetter()
 {
-	local randomNumber=$((RANDOM%2))
-	if [[ $randomNumber -eq 0 ]]
+	toss=$((RANDOM%2))
+	if [[ $toss -eq 0 ]]
 	then
 		opponentLetter="X"
 		computerLetter="O"
@@ -61,6 +70,7 @@ assignedLetter()
 	fi
 	show
 }
+
 #displayGameBoard: Displaying the gameBoard
 displayGameBoard()
 {
@@ -72,78 +82,83 @@ displayGameBoard()
 	echo "${gameBoard[6]} | ${gameBoard[7]} | ${gameBoard[8]}"
 	echo "---------"
 }
+
 #winningConditionOfRow
 winningConditionOfRow()
 {
 	win=$1
-	num=""
-	val=$win$win$win
+	string=""
+	value=$win$win$win
 	for ((i=0;i<3;i++))
 	do
 		j=0
-		num=${gameBoard[$i]}${gameBoard[$((i+3))]}${gameBoard[$((i+6))]}
-		if [[ "$num"  == "$val" ]]
+		string=${gameBoard[$i]}${gameBoard[$((i+3))]}${gameBoard[$((i+6))]}
+		if [[ "$string"  == "$value" ]]
 		then 
 			boolean=1
 			break
 		fi
 	done
 }
+
 #winningConditionOfColumn				
 winningConditionOfColumn()
 {
 	win=$1
-	num=""
-	val=$win$win$win
+	string=""
+	value=$win$win$win
 	for ((i=0;i<9;i=i+3))
 	do
 		j=0
-		num=${gameBoard[$i]}${gameBoard[$((i+1))]}${gameBoard[$((i+2))]}
-		if [[ "$num"  == "$val" ]]
+		string=${gameBoard[$i]}${gameBoard[$((i+1))]}${gameBoard[$((i+2))]}
+		if [[ "$string"  == "$value" ]]
 		then 
 			boolean=1
 			break
 		fi
 	done
 }
+
 #winningConditionOfDiagonal
 winningConditionOfDiagonal()
 {
 	win=$1
-	num=""
-	val=$win$win$win
-	num=${gameBoard[0]}${gameBoard[4]}${gameBoard[8]}
-	if [[ "$num" == "$val" ]]
+	string=""
+	value=$win$win$win
+	string=${gameBoard[0]}${gameBoard[4]}${gameBoard[8]}
+	if [[ "$string" == "$value" ]]
 	then 
 		boolean=1
 	fi
-	num=${gameBoard[6]}${gameBoard[4]}${gameBoard[2]}
-	if [[ "$num" == "$val" ]]
+	string=${gameBoard[6]}${gameBoard[4]}${gameBoard[2]}
+	if [[ "$string" == "$value" ]]
 	then 
 		boolean=1
 	fi
 }
+
 #isWinner: Checking current player is winner or not
 isWinner()
 {
-	if [[ $boolean -eq 5 ]]
+	if [[ $boolean -eq 0 ]]
 	then	
 		winningConditionOfRow $winsign
 	fi
-	if [[ $boolean -eq 5 ]]
+	if [[ $boolean -eq 0 ]]
 	then
 		winningConditionOfColumn $winsign
 	fi
-	if [[ $boolean -eq 5 ]]
+	if [[ $boolean -eq 0 ]]
 	then
 		winningConditionOfDiagonal $winsign
 	fi
 }
+
 #displayWinner: Displaying winner
 displayWinner()
 {	
 	winsign=$1
-	isWinner #$winsign
+	isWinner
 	if [[ $boolean -eq 1 && $playerTurn -eq $computerTurn ]]
 	then
 		echo "Computer wins...!!"
@@ -154,6 +169,7 @@ displayWinner()
 		choice=0
 	fi		
 }
+
 #input: Assigning values to the gameBoard
 input()
 {
@@ -210,6 +226,7 @@ computerSmartMoveForRow()
 	done
 }
 
+#Computer Smart Move For Column
 computerSmartMoveForColumn()
 {
 	flag=0
@@ -240,47 +257,61 @@ computerSmartMoveForColumn()
 	done
 }
 
-computerSmartMoveForDiagonal()
+#Computer Smart Move For Diagonal (Right TO Left)
+computerSmartMoveForDiagonalLeftToRight()
 {
 	flag=0
 	letter=$1
-	if [[ ${gameBoard[0]} == $letter && ${gameBoard[4]} == $letter && ${gameBoard[8]} == "-" ]]
+	counter1=0
+	counter2=0
+	x=0
+	for ((i=0;i<9;i=i+4))
+	do
+		if [[ ${gameBoard[$i]} == $letter ]]
+		then
+			((counter1++))
+		fi
+		if [[ ${gameBoard[$i]} == "-" ]]
+		then
+			((counter2++))
+			x=$i
+		fi
+	done
+	if [[ $counter1 == 2 && $counter2 == 1 ]]
 	then
-		position=9
-		flag=1
-		input $computerLetter
-	fi 
-	if [[ ${gameBoard[0]} == $letter && ${gameBoard[4]} == "-" && ${gameBoard[8]} == $letter ]]
-	then 
-		position=5
-		flag=1
+		position=$(($x+1)) 
+		flag=1			
 		input $computerLetter
 	fi
-	if [[ ${gameBoard[0]} == "-" && ${gameBoard[4]} == $letter && ${gameBoard[8]} == $letter ]]
+}
+
+
+#Computer Smart Move For Diagonal (Left To Right)
+computerSmartMoveForDiagonalRightToLeft()
+{
+	flag=0
+	letter=$1
+	counter1=0
+	counter2=0
+	x=0
+	for ((i=2;i<8;i=i+2))
+	do
+		if [[ ${gameBoard[$i]} == $letter ]]
+		then
+			((counter1++))
+		fi
+		if [[ ${gameBoard[$i]} == "-" ]]
+		then
+			((counter2++))
+			x=$i
+		fi
+	done
+	if [[ $counter1 == 2 && $counter2 == 1 ]]
 	then
-		position=1
+		position=$(($x+1))
 		flag=1
 		input $computerLetter
 	fi
-	if [[ ${gameBoard[6]} == $letter && ${gameBoard[4]} == $letter && ${gameBoard[2]} == "-" ]]
-	then 
-		position=3
-		flag=1
-		input $computerLetter
-	fi
-	if [[ ${gameBoard[6]} == $letter && ${gameBoard[4]} == "-" && ${gameBoard[2]} == $letter ]]
-	then 
-		position=5
-		flag=1
-		input $computerLetter
-	fi
-	if [[ ${gameBoard[6]} == "-" && ${gameBoard[4]} == $letter && ${gameBoard[2]} == $letter ]]
-	then 
-		position=7
-		flag=1
-		input $computerLetter
-	fi
-	
 }
 computerSmartMove()
 {
@@ -295,10 +326,17 @@ computerSmartMove()
 	if [[ $flag -eq 0 ]]
 	then
 		k=1
-		computerSmartMoveForDiagonal $sign
+		
+		computerSmartMoveForDiagonalLeftToRight $sign
+	fi
+	if [[ $flag -eq 0 ]]
+	then
+		k=1
+		computerSmartMoveForDiagonalRightToLeft $sign
 	fi		
 }
-#isCornerEmpty
+
+#Function To Check Corner Is Empty Or Not
 isCornerEmpty()
 {
 	flag=0
@@ -312,6 +350,8 @@ isCornerEmpty()
 		fi
 	done
 }
+
+#If Corner Is Not Available Then This Function Check Center Is Empty Or Not
 isCenterEmpty()
 {
 	if [[ ${gameBoard[4]} == "-" ]]
@@ -321,10 +361,10 @@ isCenterEmpty()
 	fi
 	input
 }
-#isSideEmpty
+
+#If Center Is Not Available Then This Function Check Side Is Empty Or Not
 isSideEmpty()
 {
-	key=0
 	flag=0
 	for (( i=0 ;i<$ROWS;i++ ))
 	do
@@ -336,6 +376,7 @@ isSideEmpty()
 	done
 	input		
 }
+
 computerMove()
 {	
 	if [[ $position -eq 0 ]]
@@ -358,12 +399,8 @@ computerMove()
 	then
 		isSideEmpty	
 	fi
-	if [[ $position -eq 0 ]]
-	then
-		position=$((RANDOM%9))
-		input $computerLetter
-	fi
 }
+
 #opponentMove
 opponentMove()
 {
@@ -371,6 +408,7 @@ opponentMove()
 	read position
 	input $opponentLetter
 }
+
 #ticTacToe: Game
 ticTacToe()
 {
